@@ -12,15 +12,15 @@ class PatientRegisterPage extends StatefulWidget {
 
 class _PatientRegisterPageState extends State<PatientRegisterPage> {
   final User user;
-  String name, age, gender = "Male";
+  String name, age, gender;
   _PatientRegisterPageState({this.user});
+  final _formKey = GlobalKey<FormState>();
   bool isInt(String s) {
     return int.tryParse(s) != null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       backgroundColor: Colors.brown[100],
       appBar: AppBar(
@@ -55,23 +55,20 @@ class _PatientRegisterPageState extends State<PatientRegisterPage> {
                 },
                 onChanged: (String val) => age = val,
               ),
-              // DropdownButtonFormField<String>(
-              //   value: gender,
-              //   items: ['Male', 'Female']
-              //       .map<DropdownMenuItem<String>>((String val) =>
-              //           DropdownMenuItem<String>(value: val, child: Text(val)))
-              //       .toList(),
-              //   onSaved: (String newval) {
-              //     gender = newval;
-              //   },
-              //   onChanged: (String newval) {
-              //     setState(() {
-              //       gender = newval;
-              //     });
-              //   },
-              // ),
+              DropdownButtonFormField<String>(
+                value: gender,
+                items: ['Male', 'Female']
+                    .map<DropdownMenuItem<String>>((String val) =>
+                        DropdownMenuItem<String>(value: val, child: Text(val)))
+                    .toList(),
+                onChanged: (String newval) {
+                  setState(() {
+                    gender = newval;
+                  });
+                },
+              ),
               RaisedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (!_formKey.currentState.validate()) return null;
                   Map<String, dynamic> patient = new Map<String, dynamic>();
                   patient['name'] = name;
@@ -79,11 +76,9 @@ class _PatientRegisterPageState extends State<PatientRegisterPage> {
                   patient['gender'] = gender;
                   patient['uid'] = user.uid;
                   patient['email'] = user.email;
-                  Firestore.instance
+                  await Firestore.instance
                       .collection('Patient')
-                      .document()
-                      .setData(patient);
-                  Navigator.pop(context);
+                      .document(user.uid).setData(patient);
                 },
                 child: Text(
                   'Submit',

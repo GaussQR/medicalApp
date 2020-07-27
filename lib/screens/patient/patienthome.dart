@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterappmain/models/patient.dart';
+import 'package:flutterappmain/models/user.dart';
+import 'package:flutterappmain/screens/authenticate/patientregister.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutterappmain/models/hospital.dart';
@@ -23,6 +25,7 @@ class _PatientHomePageState extends State<PatientHomePage> {
   @override
   Widget build(BuildContext context) {
     Patient curuser = Provider.of<Patient>(context);
+    if (curuser.name == null) return PatientRegisterPage(user: Provider.of<User>(context, listen: false));
     return Scaffold(
       appBar: AppBar(
         title: Text('Nearby Hospitals'),

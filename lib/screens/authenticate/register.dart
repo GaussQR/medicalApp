@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterappmain/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterappmain/services/globals.dart';
-import 'package:flutterappmain/screens/authenticate/patientregister.dart';
+// import 'package:flutterappmain/screens/authenticate/patientregister.dart';
 
 class Register extends StatefulWidget {
   final Function toggleView;
@@ -91,10 +92,13 @@ class _RegisterState extends State<Register> {
                         });
                       } else {
                         if (typeofUser == "Patient") {
-                          Navigator.of(context).push(MaterialPageRoute<void>(
-                              builder: (context) => PatientRegisterPage(
-                                    user: result,
-                                  )));
+                          Map<String, dynamic> patient = new Map<String, dynamic>();
+                          patient['uid'] = result.uid;
+                          patient['email'] = result.email;
+                          Firestore.instance
+                              .collection('Patient')
+                              .document(result.uid)
+                              .setData(patient);
                         }
                       }
                     }
