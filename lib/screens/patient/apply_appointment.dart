@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterappmain/models/hospital.dart';
 import 'package:flutterappmain/models/patient.dart';
 import 'package:provider/provider.dart';
 import 'package:flutterappmain/services/globals.dart';
-// import 'package:firebase_storage/firebase_storage.dart'; //uploadimage.
+import 'package:path/path.dart';
+import 'package:firebase_storage/firebase_storage.dart'; //uploadimage.
+import 'package:file_picker/file_picker.dart';
 
 class ApplyAppointment extends StatefulWidget {
   final Hospital record;
@@ -18,6 +23,10 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
   final _formKey = GlobalKey<FormState>();
   String symp, classofDisease;
   final Hospital record;
+  String fileType;
+
+  var fileName;
+  
   _ApplyAppointmentState({@required this.record});
   @override
   Widget build(BuildContext context) {
@@ -52,6 +61,22 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
                   },
                   onChanged: (String val) => symp = val,
                 ),
+                ListTile(
+                  title: Text(
+                    'Image',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  leading: Icon(
+                    Icons.image,
+                    color: Colors.redAccent,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      fileType = 'image';
+                    });
+                    filePicker(context);
+                  },
+                ),
                 RaisedButton(
                   onPressed: () {
                     if (!_formKey.currentState.validate()) {
@@ -82,5 +107,45 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
             ),
           )),
     );
+  }
+
+  Future<void> _uploadFile(File file, String filename) async {
+    StorageReference storageReference;
+    storageReference = FirebaseStorage.instance.ref().child("$fileType/$filename");
+    final StorageUploadTask uploadTask = storageReference.putFile(file);
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    print("URL is $url");
+  }
+
+  Future filePicker(BuildContext context) async {
+    try {
+      if (fileType == 'image') {
+        File file = await FilePicker.getFile(type: FileType.image);
+        setState(() {
+          fileName = basename(file.path);
+        });
+        print(fileName);
+        _uploadFile(file, fileName);
+      }
+    } on PlatformException catch (e) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Sorry...'),
+              content: Text('Unsupported File exception: $e'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          }
+        );
+    }
   }
 }

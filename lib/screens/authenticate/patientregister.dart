@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterappmain/models/patient.dart';
 import 'package:flutterappmain/models/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterappmain/screens/patient/patienthome.dart';
+import 'package:flutterappmain/services/globals.dart';
+import 'package:provider/provider.dart';
 
 class PatientRegisterPage extends StatefulWidget {
   final User user;
@@ -56,8 +60,8 @@ class _PatientRegisterPageState extends State<PatientRegisterPage> {
                 onChanged: (String val) => age = val,
               ),
               DropdownButtonFormField<String>(
-                value: gender,
-                items: ['Male', 'Female']
+                // value: gender,
+                items: genders
                     .map<DropdownMenuItem<String>>((String val) =>
                         DropdownMenuItem<String>(value: val, child: Text(val)))
                     .toList(),
@@ -78,7 +82,18 @@ class _PatientRegisterPageState extends State<PatientRegisterPage> {
                   patient['email'] = user.email;
                   await Firestore.instance
                       .collection('Patient')
-                      .document(user.uid).setData(patient);
+                      .document(user.uid)
+                      .setData(patient);
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute<void>(
+                      builder: (context) => FutureProvider<Patient>(
+                          create: (_) async => Patient.fromSnapshot(
+                              await Firestore.instance
+                                  .collection('Patient')
+                                  .document(user.uid)
+                                  .get()),
+                          child: MaterialApp(
+                              title: 'Brew Crew', home: PatientHomePage()))));
                 },
                 child: Text(
                   'Submit',

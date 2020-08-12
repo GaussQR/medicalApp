@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterappmain/models/patient.dart';
-import 'package:flutterappmain/models/user.dart';
+// import 'package:flutterappmain/models/user.dart';
 import 'package:flutterappmain/screens/authenticate/patientregister.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -19,14 +19,20 @@ class PatientHomePage extends StatefulWidget {
 
 class _PatientHomePageState extends State<PatientHomePage> {
   final AuthService _auth = AuthService();
+  Patient curuser;
   Position _currentPosition;
   Map<GeoPoint, double> distances = new Map<GeoPoint, double>();
   final Geolocator geol = Geolocator()..forceAndroidLocationManager;
   @override
   Widget build(BuildContext context) {
-    Patient curuser = Provider.of<Patient>(context);
-    if (curuser.name == null) return PatientRegisterPage(user: Provider.of<User>(context, listen: false));
-    return Scaffold(
+    curuser = Provider.of<Patient>(context);
+    if (curuser.name == null) {
+      // Navigator.of(context).push(MaterialPageRoute<void>(
+      //     builder: (context) => PatientRegisterPage(
+      //         user: curuser)));
+      return PatientRegisterPage(user: curuser);
+    }
+    else return Scaffold(
       appBar: AppBar(
         title: Text('Nearby Hospitals'),
         actions: <Widget>[
@@ -85,14 +91,18 @@ class _PatientHomePageState extends State<PatientHomePage> {
 
   Widget _buildBody(BuildContext context) {
     if (_currentPosition == null) {
-      return Center(child: Column(children: <Widget>[
-        FlatButton(
-          color: Colors.green,
-          child: Text("Please Enable Location"),
-          onPressed: () {
-            _getCurrentLocation();
-          }),
-      ],),);
+      return Center(
+        child: Column(
+          children: <Widget>[
+            FlatButton(
+                color: Colors.green,
+                child: Text("Please Enable Location"),
+                onPressed: () {
+                  _getCurrentLocation();
+                }),
+          ],
+        ),
+      );
     }
     return StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance.collection('Hospitals').snapshots(),
