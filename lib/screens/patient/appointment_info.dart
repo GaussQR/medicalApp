@@ -11,32 +11,42 @@ class AppointmentInfo extends StatelessWidget {
         title: Text('Appointment Info'),
       ),
       body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          children: <Widget>[
-            Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(rec.hospitalName,
-                        style: TextStyle(fontWeight: FontWeight.w500)),
-                    leading: Icon(
-                      Icons.local_hospital,
-                      color: Colors.blue[500],
-                    ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        children: <Widget>[
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(rec.hospitalName,
+                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  leading: Icon(
+                    Icons.local_hospital,
+                    color: Colors.blue[500],
                   ),
-                  Divider(),
-                  ListTile(
-                    title: Text(rec.sympText),
-                    leading: Icon(
-                      Icons.contact_mail,
-                      color: Colors.blue[500],
-                    ),
+                ),
+                Divider(),
+                ListTile(
+                  title: Text(rec.sympText),
+                  leading: Icon(
+                    Icons.contact_mail,
+                    color: Colors.blue[500],
                   ),
-                ],
-              ),
+                ),
+                Divider(),
+                if (rec.images != null && rec.images.length > 0)
+                  RaisedButton(
+                    onPressed: () {
+                      // Navigator.of(context).push(MaterialPageRoute<void>(
+                      //     builder: (context) =>
+                      //         PhotoUser(gal: rec.images)));
+                    },
+                    child: Text('Show uploaded images.'),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }

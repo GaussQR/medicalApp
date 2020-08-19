@@ -38,7 +38,9 @@ class UpcomingAppointment extends StatelessWidget {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     IconData status = Icons.error;
+    print(document.data);
     TextAppointment appointment = TextAppointment.fromSnapshot(document);
+    print(appointment.images);
     if (appointment.status == "Approved") status = Icons.check_circle_outline;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

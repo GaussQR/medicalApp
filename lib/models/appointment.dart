@@ -8,6 +8,7 @@ class TextAppointment{
 	final String sympText;
   final String classofDisease;
   String status;
+  final List<String> images; 
 	final DocumentReference reference;
 	String doctorId;
 	TextAppointment.fromSnapshot(DocumentSnapshot snapshot)
@@ -18,6 +19,7 @@ class TextAppointment{
 			this.sympText = snapshot.data['symptoms_text'],
       this.classofDisease = snapshot.data['class'],
       this.status = snapshot.data['status'],
+      this.images = (snapshot.data.containsKey('images')) ? snapshot.data['images'].cast<String>() : [],
 			this.reference = snapshot.reference;
 	void updateDoctor(String dId) => doctorId = dId;
   void updateStatus(String sts) => status = sts;

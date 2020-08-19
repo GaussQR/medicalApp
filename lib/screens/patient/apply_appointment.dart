@@ -26,7 +26,8 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
   String fileType;
 
   var fileName;
-  
+  List<String> urls = List<String>();
+
   _ApplyAppointmentState({@required this.record});
   @override
   Widget build(BuildContext context) {
@@ -63,14 +64,15 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
                 ),
                 ListTile(
                   title: Text(
-                    'Image',
-                    style: TextStyle(color: Colors.white),
+                    urls.length == 0 ? "Upload Images" : "Image Submitted",
+                    style: TextStyle(color: Colors.black),
                   ),
                   leading: Icon(
                     Icons.image,
-                    color: Colors.redAccent,
+                    color: Colors.blueAccent,
                   ),
                   onTap: () {
+                    // if (url.le != null) return;
                     setState(() {
                       fileType = 'image';
                     });
@@ -91,6 +93,9 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
                     appt['hospital_name'] = record.name;
                     appt['patient_name'] = curr.name;
                     appt['status'] = "Pending";
+                    if (urls.length > 0) {
+                      appt['images'] = urls;
+                    }
                     Firestore.instance
                         .collection('Appointments')
                         .document()
@@ -111,10 +116,10 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
 
   Future<void> _uploadFile(File file, String filename) async {
     StorageReference storageReference;
-    storageReference = FirebaseStorage.instance.ref().child("$fileType/$filename");
+    storageReference = FirebaseStorage.instance.ref().child("$filename");
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
-    final String url = (await downloadUrl.ref.getDownloadURL());
+    urls.add((await downloadUrl.ref.getDownloadURL()));
     print("URL is $url");
   }
 
@@ -126,10 +131,14 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
           fileName = basename(file.path);
         });
         print(fileName);
+        fileName = "Appointments/" +
+            Provider.of<Patient>(context, listen: false).uid +
+            "/" +
+            fileName;
         _uploadFile(file, fileName);
       }
     } on PlatformException catch (e) {
-        showDialog(
+      showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
@@ -144,8 +153,7 @@ class _ApplyAppointmentState extends State<ApplyAppointment> {
                 )
               ],
             );
-          }
-        );
+          });
     }
   }
 }

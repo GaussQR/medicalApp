@@ -1,4 +1,4 @@
-package com.suicidesquad.flutterappmain
+package com.suicidesquad.flutter_app_main
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
